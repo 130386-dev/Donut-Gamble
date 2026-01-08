@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Golden Glaze — Feeling Lucky Demo</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <div class="kicker">
+        <h1>Golden Glaze — “Feeling Lucky?” Donut Picker (Demo)</h1>
+        <p class="note">Optional mini-demo: roll for a random selection of flavors.</p>
+      </div>
+
+      <p class="sub">
+        Pick a quantity, hit <b>Spin</b>, and all slots roll at once. This is just a prototype page.
+      </p>
+
+      <div class="controls">
+        <div class="field">
+          <label for="qtyPreset">Quantity</label>
+          <select id="qtyPreset">
+            <option value="6">Half-Dozen (6)</option>
+            <option value="12" selected>Dozen (12)</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+
+        <div class="field" id="customWrap" style="display:none;">
+          <label for="customQty">Custom amount (2–18)</label>
+          <input id="customQty" type="number" min="2" max="100" value="12" />
+        </div>
+
+        <div class="btnrow">
+          <button class="primary" id="spinBtn">Spin 🍩</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="board">
+      <div class="slots" id="slots"></div>
+
+      <div class="statusRow">
+        <div class="status">Slots: <span class="count" id="slotCount">12</span></div>
+        <div class="tiny">This is a visual demo — not real checkout.</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
