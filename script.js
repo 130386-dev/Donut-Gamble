@@ -109,7 +109,7 @@ const rankedTiers = [
     points: 40,
     color: "#b266ff",
     items: [
-      "Cookies & Cream",
+      "Cookies & Cream Filled",
       "Boston Cream",
       "Salted Caramel Crunch",
       "S'mores Donut",
@@ -153,6 +153,11 @@ const customWrap = document.getElementById("customWrap");
 const customQty = document.getElementById("customQty");
 const spinBtn = document.getElementById("spinBtn");
 const slotCountEl = document.getElementById("slotCount");
+// Ranked mode UI (add these elements in HTML)
+const rankedModeEl = document.getElementById("rankedMode");
+const playerNameEl = document.getElementById("playerName");
+const lastScoreEl = document.getElementById("lastScore");
+
 
 function getQty(){
   if(qtyPreset.value === "custom"){
@@ -244,58 +249,96 @@ function spin(){
   const slotDivs = Array.from(document.querySelectorAll(".slot"));
   const itemHeight = 44; // must match CSS .reelItem height
 
-  // Disable buttons during spin
+  const rankedOn = rankedModeEl ? rankedModeEl.checked : false;
+  let totalScore = 0;
+  let longest = 0;
+
+  // Disable button during spin
   spinBtn.disabled = true;
   spinBtn.classList.add("disabled");
 
   slotDivs.forEach((slot, idx) => {
     const reel = slot.querySelector(".reel");
 
-    // Decide final flavor for this slot
-    const final = randomFlavor();
+    // Clear any old rarity effects (Ranked-only visuals)
+    slot.classList.remove("rarity-epic","rarity-legendary","rarity-mythic");
+
+    // Decide final outcome
+    let finalText = "";
+    let rarityClass = "";
+
+    if(rankedOn){
+      const result = rankedRoll();
+      totalScore += result.points;
+
+      finalText = `${result.tier} — ${result.flavor}`;
+
+      if(result.tier === "Epic") rarityClass = "rarity-epic";
+      if(result.tier === "Legendary") rarityClass = "rarity-legendary";
+      if(result.tier === "Mythic") rarityClass = "rarity-mythic";
+    } else {
+      finalText = randomFlavor();
+    }
 
     // Build strip and render it
-    const strip = makeReelStrip(final, 20);
+    const strip = makeReelStrip(finalText, 40);
     reel.innerHTML = strip.map(f => `<div class="reelItem">${f}</div>`).join("");
 
     // Reset position instantly
     reel.style.transition = "none";
     reel.style.transform = "translateY(0px)";
+    reel.offsetHeight; // force layout
 
-    // Force layout so the reset applies before the animation
-    reel.offsetHeight;
-
-    // Add spinning class (blur/glow)
+    // Start "spinning" visuals
     slot.classList.remove("stopping");
     slot.classList.add("spinning");
 
-    // Animate to the final item:
-    // translateY negative so content moves UP (looks like words coming DOWN)
+    // End position: last item in strip
     const endY = -((strip.length - 1) * itemHeight);
 
-    // Stagger and vary durations for drama
-	  const base = 2800;              // longer base spin
-	  const extra = idx * 220;         // bigger stagger between reels
-	  const variance = Math.random() * 900; // randomness for suspense
-	  const duration = base + extra + variance; // ~2.8s to ~6.5s (depending on count)
+    // Longer spin + more desync (suspense)
+    const base = 2800;
+    const extra = idx * 220;
+    const variance = Math.random() * 900;
+    const suspenseBoost = (idx >= slotDivs.length - 2) ? 600 : 0; // last 2 reels drag
+    const duration = base + extra + variance + suspenseBoost;
 
+    longest = Math.max(longest, duration);
 
-    // Easing that slows down hard at the end
-    // (big “brake” feel)
     const easing = "cubic-bezier(.08,.82,.15,1)";
 
-    // Start animation on next frame
     requestAnimationFrame(() => {
       reel.style.transition = `transform ${duration}ms ${easing}`;
       reel.style.transform = `translateY(${endY}px)`;
     });
 
-    // Clean up after it stops
+    // Clean up near end + apply rarity glow after stop (ranked only)
     window.setTimeout(() => {
       slot.classList.remove("spinning");
       slot.classList.add("stopping");
+
+      if(rankedOn && rarityClass){
+        slot.classList.add(rarityClass);
+      }
     }, duration - 120);
   });
+
+  // Re-enable exactly after the longest reel stops
+  window.setTimeout(() => {
+    spinBtn.disabled = false;
+    spinBtn.classList.remove("disabled");
+
+    // Score output (Ranked only)
+    if(lastScoreEl){
+      if(rankedOn){
+        const name = (playerNameEl?.value || "Player").trim() || "Player";
+        lastScoreEl.textContent = `${name}'s Ranked Score: ${totalScore}`;
+      } else {
+        lastScoreEl.textContent = ""; // keep normal mode clean
+      }
+    }
+  }, longest + 80);
+}
 
   // Re-enable after the longest possible slot finishes
   const maxDuration = 2800 + (slotDivs.length - 1) * 220 + 900;
@@ -323,4 +366,5 @@ spinBtn.addEventListener("click", spin);
 
 // Init
 buildSlots(getQty());
+
 
