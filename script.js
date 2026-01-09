@@ -340,14 +340,6 @@ function spin(){
   }, longest + 80);
 }
 
-  // Re-enable after the longest possible slot finishes
-  const maxDuration = 2800 + (slotDivs.length - 1) * 220 + 900;
-  window.setTimeout(() => {
-    spinBtn.disabled = false;
-    spinBtn.classList.remove("disabled");
-  }, maxDuration + 50);
-}
-
 // Events
 qtyPreset.addEventListener("change", () => {
   if(qtyPreset.value === "custom"){
@@ -366,5 +358,6 @@ spinBtn.addEventListener("click", spin);
 
 // Init
 buildSlots(getQty());
+
 
 
