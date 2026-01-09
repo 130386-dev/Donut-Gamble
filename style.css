@@ -237,3 +237,28 @@ button{
   font-size:12px;
   opacity:.75;
 }
+
+/* Ranked rarity effects */
+.slot.rarity-epic{
+  box-shadow: 0 0 18px rgba(178,102,255,0.6);
+}
+
+.slot.rarity-legendary{
+  box-shadow: 0 0 26px rgba(255,200,87,0.8);
+  animation: pulseGold 0.8s ease-in-out infinite alternate;
+}
+
+.slot.rarity-mythic{
+  box-shadow: 0 0 30px rgba(255,133,161,0.9);
+  animation: pulseMythic 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes pulseGold{
+  from { box-shadow: 0 0 16px rgba(255,200,87,0.5); }
+  to   { box-shadow: 0 0 32px rgba(255,200,87,1); }
+}
+
+@keyframes pulseMythic{
+  from { box-shadow: 0 0 18px rgba(255,133,161,0.6); }
+  to   { box-shadow: 0 0 40px rgba(255,133,161,1); }
+}
