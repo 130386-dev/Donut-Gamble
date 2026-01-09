@@ -63,6 +63,89 @@ const flavors = [
   "Peaches & Cream"
 ];
 
+// Ranked Mode rarity pools (satire: more "universally loved" = rarer)
+
+const rankedTiers = [
+  {
+    name: "Common",
+    weight: 55,
+    points: 5,
+    color: "#b8b8b8",
+    items: [
+      "Everything Bagel Donut",
+      "Cheddar Jalapeño",
+      "Black Sesame",
+      "Lavender Honey",
+      "Rose Pistachio",
+      "Ube Purple Yam",
+      "Matcha Green Tea",
+      "Mango Tango",
+      "Passionfruit Glaze",
+      "Maple Sausage",
+      "Peanut Butter Filled"
+    ]
+  },
+  {
+    name: "Rare",
+    weight: 28,
+    points: 15,
+    color: "#4da6ff",
+    items: [
+      "Lemon Filled",
+      "Blueberry Jelly Filled",
+      "Raspberry Jelly Filled",
+      "Strawberry Jelly Filled",
+      "Key Lime Pie Donut",
+      "Banana Foster",
+      "Tiramisu Donut",
+      "Churro Donut",
+      "Apple Fritter",
+      "French Cruller"
+    ]
+  },
+  {
+    name: "Epic",
+    weight: 12,
+    points: 40,
+    color: "#b266ff",
+    items: [
+      "Cookies & Cream",
+      "Boston Cream",
+      "Salted Caramel Crunch",
+      "S'mores Donut",
+      "Oreo Crumble",
+      "Chocolate Ganache",
+      "Toasted Coconut"
+    ]
+  },
+  {
+    name: "Legendary",
+    weight: 4,
+    points: 120,
+    color: "#ffc857",
+    items: [
+      "Glazed Classic",
+      "Chocolate Frosted",
+      "Vanilla Frosted",
+      "Cinnamon Sugar",
+      "Powdered Sugar",
+      "Old-Fashioned Cake"
+    ]
+  },
+  {
+    name: "Mythic",
+    weight: 1,
+    points: 300,
+    color: "#ff85a1",
+    items: [
+      "The IronPig (Maple Bacon)",
+      "The Steel Worker (Chocolate Espresso)",
+      "The Crayola Classic (Tie-Dye Glaze)",
+      "The Zoo-Nut (Animal Crackers & Frosting)"
+    ]
+  }
+];
+
 
 const slotsEl = document.getElementById("slots");
 const qtyPreset = document.getElementById("qtyPreset");
@@ -83,6 +166,23 @@ function getQty(){
 function randomFlavor(){
   return flavors[Math.floor(Math.random() * flavors.length)];
 }
+
+function weightedPickTier(){
+  const total = rankedTiers.reduce((s,t)=>s+t.weight,0);
+  let r = Math.random() * total;
+  for(const tier of rankedTiers){
+    r -= tier.weight;
+    if(r <= 0) return tier;
+  }
+  return rankedTiers[0];
+}
+
+function rankedRoll(){
+  const tier = weightedPickTier();
+  const item = tier.items[Math.floor(Math.random() * tier.items.length)];
+  return { flavor: item, tier: tier.name, points: tier.points, color: tier.color };
+}
+
 
 function buildSlots(n){
   slotsEl.innerHTML = "";
@@ -223,3 +323,4 @@ spinBtn.addEventListener("click", spin);
 
 // Init
 buildSlots(getQty());
+
